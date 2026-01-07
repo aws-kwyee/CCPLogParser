@@ -26,8 +26,12 @@ import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
+import IconButton from '@material-ui/core/IconButton';
 import DescriptionIcon from '@material-ui/icons/Description';
 import FeedbackIcon from '@material-ui/icons/Feedback';
+import Brightness4Icon from '@material-ui/icons/Brightness4';
+import Brightness7Icon from '@material-ui/icons/Brightness7';
+import { ThemeProvider, useTheme } from './ThemeContext';
 import './App.css';
 import pkg from '../package.json';
 import EmptyView from './EmptyView';
@@ -35,9 +39,8 @@ import DraggingView from './DraggingView';
 import LoadingView from './LoadingView';
 import SnapshotListView from './SnapshotListView';
 import LogView from './LogView';
-import SkewMetricsView from './SkewMetricsView';
-import ApiCallMetricsView from './ApiCallMetricsView';
 import RtcMetricsViewGroup from './RtcMetricsViewGroup';
+import ThemedMetricsView from './ThemedMetricsView';
 
 import {
     buildIndex, findExtras, resetIndex, hasSoftphoneMetrics, resetSoftphoneMetrics,
@@ -84,13 +87,14 @@ function a11yProps(index) {
 const styles = (theme) => ({
     root: {
         flexGrow: 1,
-        backgroundColor: '#f5f5f5',
     },
-    appbar: {
-        backgroundColor: '#26303b',
-    },
+    appbar: {},
     title: {
         flexGrow: 1,
+    },
+    themeToggle: {
+        marginLeft: theme.spacing(1),
+        color: 'white',
     },
     feedbackLink: {
         '& a': {
@@ -107,9 +111,7 @@ const styles = (theme) => ({
             display: 'block',
         },
     },
-    tab: {
-        backgroundColor: '#2e3a48',
-    },
+    tab: {},
     content: {
         zIndex: 2,
         paddingTop: theme.spacing(2),
@@ -122,6 +124,21 @@ const styles = (theme) => ({
         marginLeft: theme.spacing(1),
     },
 });
+
+const ThemeToggle = ({ classes }) => {
+    const { currentTheme, toggleTheme } = useTheme();
+    const isDark = currentTheme === 'dark';
+
+    return (
+        <IconButton className={classes.themeToggle} onClick={toggleTheme} size="small" title={isDark ? 'Light mode' : 'Dark mode'}>
+            {isDark ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
+    );
+};
+
+ThemeToggle.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
 
 class App extends React.Component {
     constructor(props) {
@@ -271,133 +288,230 @@ class App extends React.Component {
         const { classes } = this.props;
 
         return (
-            <NorthStarThemeProvider>
-                <div className={classes.root}>
-                    <Dropzone
-                        ref={this.dropzoneRef}
-                        disableClick
-                        noClick
-                        onDrop={this.handleOnDrop}
-                    >
-                        {({ getRootProps, isDragActive }) => (
-                            // eslint-disable-next-line react/jsx-props-no-spreading
-                            <div {...getRootProps()}>
-                                <AppBar position="static" className={classes.appbar}>
-                                    <Toolbar variant="dense">
-                                        <Typography variant="h6" color="inherit" className={classes.title}>
-                                            CCP Log Parser
-                                            { filename && (
-                                                <span>
-                                                    &nbsp;:&nbsp;
-                                                    {filename}
-                                                </span>
-                                            ) }
-                                        </Typography>
-                                        <Typography color="inherit" className={classes.feedbackLink}>
-                                            <Link
-                                                href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/CHANGELOG.md"
-                                                target="_blank"
-                                                rel="noopener"
-                                                onClick={(e) => e.preventDefault}
-                                            >
-                                                Version:
-                                                {' '}
-                                                {pkg.version}
-                                            </Link>
-                                        </Typography>
-                                        <Typography color="inherit" className={classes.feedbackLink}>
-                                            <Link
-                                                href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/README.md"
-                                                target="_blank"
-                                                rel="noopener"
-                                                onClick={(e) => e.preventDefault}
-                                            >
-                                                <DescriptionIcon className={classes.leftIcon} />
-                                                User Guide
-                                            </Link>
-                                        </Typography>
-                                        <Typography color="inherit" className={classes.feedbackLink}>
-                                            <Link
-                                                href="https://github.com/amazon-connect/amazon-connect-snippets/issues"
-                                                target="_blank"
-                                                rel="noopener"
-                                                onClick={(e) => e.preventDefault}
-                                            >
-                                                <FeedbackIcon className={classes.leftIcon} />
-                                                Send Feedback
-                                            </Link>
-                                        </Typography>
-                                    </Toolbar>
-                                    { (!isInitial && !isLoading) && (
-                                        <Tabs className={classes.tab} value={tabIndex} onChange={this.handleChangeTab} centered aria-label="tabs">
-                                            {/* eslint-disable-next-line max-len */}
-                                            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                                            <Tab label="Snapshots &amp; Logs" {...a11yProps(0)} />
-                                            {/* eslint-disable-next-line max-len */}
-                                            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                                            <Tab label="Metrics" {...a11yProps(1)} />
-                                        </Tabs>
-                                    ) }
-                                </AppBar>
-
-                                { isDragActive && <DraggingView /> }
-
-                                { (isInitial && !isLoading) && <EmptyView /> }
-                                { isLoading && <LoadingView /> }
-                                { (!isInitial && !isLoading) && (
-                                    <>
-                                        <TabPanel value={tabIndex} index={0}>
-                                            <Container className={classes.content}>
-                                                <Grid container spacing={2}>
-                                                    <Grid item xs={12} md={3} style={isExpanded ? { display: 'none' } : {}}>
-                                                        <SnapshotListView
-                                                            log={log}
-                                                            selected={selectedSnapshots}
-                                                            selectLog={this.selectLog}
-                                                            selectSnapshots={this.selectSnapshots}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={12} md={9} style={isExpanded ? { minWidth: '100%', maxWidth: '100%' } : {}}>
-                                                        <LogView
-                                                            log={log}
-                                                            selected={selectedLog}
-                                                            isExpanded={isExpanded}
-                                                            expand={this.handleExpandLogView}
-                                                        />
-                                                    </Grid>
-                                                </Grid>
-                                            </Container>
-                                        </TabPanel>
-                                        <TabPanel value={tabIndex} index={1}>
-                                            <Container className={classes.content}>
-                                                <Grid container spacing={2}>
-                                                    <Grid item xs={12}>
-                                                        <SkewMetricsView
-                                                            log={log}
-                                                        />
-                                                        <ApiCallMetricsView
-                                                            log={log}
-                                                            indexedLogs={indexedLogs}
-                                                        />
-                                                        { hasRtcMetrics && (
-                                                            <RtcMetricsViewGroup
-                                                                timeRange={timeRange}
-                                                            />
-                                                        )}
-                                                    </Grid>
-                                                </Grid>
-                                            </Container>
-                                        </TabPanel>
-                                    </>
-                                ) }
-                            </div>
-                        )}
-                    </Dropzone>
-                </div>
-            </NorthStarThemeProvider>
+            <ThemeProvider>
+                <ThemedApp
+                    classes={classes}
+                    tabIndex={tabIndex}
+                    isInitial={isInitial}
+                    isLoading={isLoading}
+                    isExpanded={isExpanded}
+                    filename={filename}
+                    log={log}
+                    selectedLog={selectedLog}
+                    selectedSnapshots={selectedSnapshots}
+                    indexedLogs={indexedLogs}
+                    hasRtcMetrics={hasRtcMetrics}
+                    timeRange={timeRange}
+                    handleChangeTab={this.handleChangeTab}
+                    handleOnDrop={this.handleOnDrop}
+                    handleExpandLogView={this.handleExpandLogView}
+                    selectLog={this.selectLog}
+                    selectSnapshots={this.selectSnapshots}
+                    dropzoneRef={this.dropzoneRef}
+                />
+            </ThemeProvider>
         );
     }
 }
+
+const ThemedApp = ({
+    classes,
+    tabIndex,
+    isInitial,
+    isLoading,
+    isExpanded,
+    filename,
+    log,
+    selectedLog,
+    selectedSnapshots,
+    indexedLogs,
+    hasRtcMetrics,
+    timeRange,
+    handleChangeTab,
+    handleOnDrop,
+    handleExpandLogView,
+    selectLog,
+    selectSnapshots,
+    dropzoneRef,
+}) => {
+    const { theme } = useTheme();
+
+    const themedStyles = {
+        root: {
+            backgroundColor: theme.colors.background,
+            minHeight: '100vh',
+        },
+        appbar: {
+            backgroundColor: theme.colors.appBar,
+        },
+        tab: {
+            backgroundColor: theme.colors.tabs,
+        },
+    };
+
+    return (
+        <NorthStarThemeProvider>
+            <div className={classes.root} style={themedStyles.root}>
+                <Dropzone
+                    ref={dropzoneRef}
+                    disableClick
+                    noClick
+                    onDrop={handleOnDrop}
+                >
+                    {({ getRootProps, isDragActive }) => (
+                        // eslint-disable-next-line react/jsx-props-no-spreading
+                        <div {...getRootProps()}>
+                            <AppBar position="static" className={classes.appbar} style={themedStyles.appbar}>
+                                <Toolbar variant="dense">
+                                    <Typography variant="h6" color="inherit" className={classes.title}>
+                                        CCP Log Parser
+                                        { filename && (
+                                            <span>
+                                                &nbsp;:&nbsp;
+                                                {filename}
+                                            </span>
+                                        ) }
+                                    </Typography>
+                                    <Typography color="inherit" className={classes.feedbackLink}>
+                                        <Link
+                                            href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/CHANGELOG.md"
+                                            target="_blank"
+                                            rel="noopener"
+                                            onClick={(e) => e.preventDefault}
+                                        >
+                                            Version:
+                                            {' '}
+                                            {pkg.version}
+                                        </Link>
+                                    </Typography>
+                                    <Typography color="inherit" className={classes.feedbackLink}>
+                                        <Link
+                                            href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/README.md"
+                                            target="_blank"
+                                            rel="noopener"
+                                            onClick={(e) => e.preventDefault}
+                                        >
+                                            <DescriptionIcon className={classes.leftIcon} />
+                                            User Guide
+                                        </Link>
+                                    </Typography>
+                                    <Typography color="inherit" className={classes.feedbackLink}>
+                                        <Link
+                                            href="https://github.com/amazon-connect/amazon-connect-snippets/issues"
+                                            target="_blank"
+                                            rel="noopener"
+                                            onClick={(e) => e.preventDefault}
+                                        >
+                                            <FeedbackIcon className={classes.leftIcon} />
+                                            Send Feedback
+                                        </Link>
+                                    </Typography>
+                                    <ThemeToggle classes={classes} />
+                                </Toolbar>
+                                { (!isInitial && !isLoading) && (
+                                    <Tabs
+                                        className={classes.tab}
+                                        style={themedStyles.tab}
+                                        value={tabIndex}
+                                        onChange={handleChangeTab}
+                                        centered
+                                        aria-label="tabs"
+                                    >
+                                        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                                        <Tab label="Snapshots &amp; Logs" {...a11yProps(0)} />
+                                        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                                        <Tab label="Metrics" {...a11yProps(1)} />
+                                    </Tabs>
+                                ) }
+                            </AppBar>
+
+                            { isDragActive && <DraggingView /> }
+
+                            { (isInitial && !isLoading) && <EmptyView /> }
+                            { isLoading && <LoadingView /> }
+                            { (!isInitial && !isLoading) && (
+                                <>
+                                    <TabPanel value={tabIndex} index={0}>
+                                        <Container className={classes.content}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} md={3} style={isExpanded ? { display: 'none' } : {}}>
+                                                    <SnapshotListView
+                                                        log={log}
+                                                        selected={selectedSnapshots}
+                                                        selectLog={selectLog}
+                                                        selectSnapshots={selectSnapshots}
+                                                    />
+                                                </Grid>
+                                                <Grid
+                                                    item
+                                                    xs={12}
+                                                    md={9}
+                                                    style={isExpanded ? { minWidth: '100%', maxWidth: '100%' } : {}}
+                                                >
+                                                    <LogView
+                                                        log={log}
+                                                        selected={selectedLog}
+                                                        isExpanded={isExpanded}
+                                                        expand={handleExpandLogView}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Container>
+                                    </TabPanel>
+                                    <TabPanel value={tabIndex} index={1}>
+                                        <Container className={classes.content}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12}>
+                                                    <ThemedMetricsView
+                                                        log={log}
+                                                        indexedLogs={indexedLogs}
+                                                    />
+                                                    { hasRtcMetrics && (
+                                                        <RtcMetricsViewGroup
+                                                            timeRange={timeRange}
+                                                        />
+                                                    )}
+                                                </Grid>
+                                            </Grid>
+                                        </Container>
+                                    </TabPanel>
+                                </>
+                            ) }
+                        </div>
+                    )}
+                </Dropzone>
+            </div>
+        </NorthStarThemeProvider>
+    );
+};
+
+ThemedApp.propTypes = {
+    classes: PropTypes.object.isRequired,
+    tabIndex: PropTypes.number.isRequired,
+    isInitial: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    isExpanded: PropTypes.bool.isRequired,
+    filename: PropTypes.string,
+    log: PropTypes.array.isRequired,
+    selectedLog: PropTypes.array.isRequired,
+    selectedSnapshots: PropTypes.array.isRequired,
+    indexedLogs: PropTypes.object,
+    hasRtcMetrics: PropTypes.bool,
+    timeRange: PropTypes.array,
+    handleChangeTab: PropTypes.func.isRequired,
+    handleOnDrop: PropTypes.func.isRequired,
+    handleExpandLogView: PropTypes.func.isRequired,
+    selectLog: PropTypes.func.isRequired,
+    selectSnapshots: PropTypes.func.isRequired,
+    dropzoneRef: PropTypes.object.isRequired,
+};
+
+ThemedApp.defaultProps = {
+    filename: null,
+    indexedLogs: null,
+    hasRtcMetrics: false,
+    timeRange: null,
+};
 
 App.propTypes = {
     classes: PropTypes.object.isRequired,

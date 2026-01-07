@@ -16,6 +16,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import { useTheme } from './ThemeContext';
 
 const styles = (theme) => ({
     root: {
@@ -38,26 +39,35 @@ const styles = (theme) => ({
     },
     icon: {
         fontSize: 160,
-        color: 'rgba(0,0,0,0.25)',
     },
-    text: {
-        color: 'rgba(0,0,0,0.5)',
-    },
+    text: {},
 });
 
 const EmptyView = (props) => {
     const { classes } = props;
 
     return (
-        <div className={classes.root}>
+        <ThemedEmptyView classes={classes} />
+    );
+};
+
+const ThemedEmptyView = ({ classes }) => {
+    const { theme } = useTheme();
+
+    return (
+        <div className={classes.root} style={{ backgroundColor: theme.colors.background }}>
             <div className={classes.container}>
-                <SaveAltIcon className={classes.icon} />
-                <Typography className={classes.text} variant="h5" component="h3">
+                <SaveAltIcon className={classes.icon} style={{ color: theme.colors.iconSecondary }} />
+                <Typography className={classes.text} variant="h5" component="h3" style={{ color: theme.colors.textMuted }}>
                     Drag &amp; Drop your CCP log file to load
                 </Typography>
             </div>
         </div>
     );
+};
+
+ThemedEmptyView.propTypes = {
+    classes: PropTypes.object.isRequired,
 };
 
 EmptyView.propTypes = {

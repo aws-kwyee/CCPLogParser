@@ -23,6 +23,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import UnfoldLess from '@material-ui/icons/UnfoldLess';
 import UnfoldMore from '@material-ui/icons/UnfoldMore';
+import { useTheme } from './ThemeContext';
 import LogLineView from './LogLineView';
 
 const styles = (theme) => ({
@@ -45,7 +46,6 @@ const styles = (theme) => ({
         flexShrink: 0,
         flexDirection: 'column',
         padding: theme.spacing(1, 2),
-        background: '#f7f7f7',
     },
     headerInside: {
         position: 'relative',
@@ -94,7 +94,6 @@ const styles = (theme) => ({
         padding: theme.spacing(2, 0),
         whiteSpace: 'pre',
         backgroundColor: 'transparent',
-        color: '#222222',
         fontWeight: 400,
         outline: 'none',
     },
@@ -161,64 +160,129 @@ class LogView extends React.PureComponent {
         }
 
         return (
-            <div className={clsx(classes.root, classNameProp)}>
-                <Paper>
-                    <div className={classes.header}>
-                        <div className={classes.headerInside}>
-                            <Typography className={classes.title} variant="h6" component="h3">
-                                Log
-                            </Typography>
-                            <div className={classes.regexFilter}>
-                                <Input
-                                    placeholder="Filter ..."
-                                    type="search"
-                                    value={regexFilter}
-                                    onChange={this.handleChangeRegexFilter}
-                                />
-                            </div>
-                            <div className={classes.levelFilter}>
-                                <Select
-                                    options={LogLevelOptions}
-                                    selectedOption={{ value: levelFilter }}
-                                    onChange={this.handleChangeLevelFilter}
-                                />
-                            </div>
-                            { !isExpanded
-                                ? <Button variant="link" className={classes.expand} onClick={() => expand()}><UnfoldMore style={{ transform: 'rotate(90deg)' }} /></Button>
-                                : <Button variant="link" className={classes.expand} onClick={() => expand()}><UnfoldLess style={{ transform: 'rotate(90deg)' }} /></Button> }
-                        </div>
-                    </div>
-                    <div className={classes.content}>
-                        <div className={classes.rows}>
-                            { log.map((event) => {
-                                if (LogLevel[event.level] >= levelFilter
-                        && (re
-                            // test against the one-line log expression
-                            ? (re.exec(`${event.time} ${event.component} ${event.level} ${event.text}`)
-                            // test against stringified event.exception if exists
-                            || (event.exception && re.exec(`${JSON.stringify(event.exception)}`))
-                            // test against stringified event.objects if exists
-                            || (event.objects && event.objects.length && re.exec(`${JSON.stringify(event.objects)}`)))
-                            : true)) {
-                                    return (
-                                        <LogLineView
-                                            id={`L${event._key}`}
-                                            key={event._key}
-                                            className={classes.row}
-                                            event={event}
-                                            isSelected={selected.includes(event._key)}
-                                        />
-                                    );
-                                }
-                                return null; // ignore this line
-                            }) }
-                        </div>
-                    </div>
-                </Paper>
-            </div>
+            <ThemedLogView
+                classes={classes}
+                className={classNameProp}
+                log={log}
+                selected={selected}
+                isExpanded={isExpanded}
+                expand={expand}
+                levelFilter={levelFilter}
+                regexFilter={regexFilter}
+                re={re}
+                handleChangeLevelFilter={this.handleChangeLevelFilter}
+                handleChangeRegexFilter={this.handleChangeRegexFilter}
+            />
         );
     }
 }
+
+const ThemedLogView = ({
+    classes,
+    className: classNameProp,
+    log,
+    selected,
+    isExpanded,
+    expand,
+    levelFilter,
+    regexFilter,
+    re,
+    handleChangeLevelFilter,
+    handleChangeRegexFilter,
+}) => {
+    const { theme } = useTheme();
+
+    const themedStyles = {
+        header: {
+            background: theme.colors.surfaceSecondary,
+        },
+        content: {
+            color: theme.colors.textPrimary,
+        },
+        paper: {
+            backgroundColor: theme.colors.surface,
+        },
+    };
+
+    return (
+        <div className={clsx(classes.root, classNameProp)}>
+            <Paper style={themedStyles.paper}>
+                <div className={classes.header} style={themedStyles.header}>
+                    <div className={classes.headerInside}>
+                        <Typography className={classes.title} variant="h6" component="h3" style={{ color: theme.colors.textPrimary }}>
+                            Log
+                        </Typography>
+                        <div className={classes.regexFilter}>
+                            <Input
+                                placeholder="Filter ..."
+                                type="search"
+                                value={regexFilter}
+                                onChange={handleChangeRegexFilter}
+                            />
+                        </div>
+                        <div className={classes.levelFilter}>
+                            <Select
+                                options={LogLevelOptions}
+                                selectedOption={{ value: levelFilter }}
+                                onChange={handleChangeLevelFilter}
+                            />
+                        </div>
+                        { !isExpanded
+                            ? <Button variant="link" className={classes.expand} onClick={() => expand()}><UnfoldMore style={{ transform: 'rotate(90deg)' }} /></Button>
+                            : <Button variant="link" className={classes.expand} onClick={() => expand()}><UnfoldLess style={{ transform: 'rotate(90deg)' }} /></Button> }
+                    </div>
+                </div>
+                <div className={classes.content} style={themedStyles.content}>
+                    <div className={classes.rows}>
+                        { log.map((event) => {
+                            if (LogLevel[event.level] >= levelFilter
+                    && (re
+                        // test against the one-line log expression
+                        ? (re.exec(`${event.time} ${event.component} ${event.level} ${event.text}`)
+                        // test against stringified event.exception if exists
+                        || (event.exception && re.exec(`${JSON.stringify(event.exception)}`))
+                        // test against stringified event.objects if exists
+                        || (event.objects && event.objects.length && re.exec(`${JSON.stringify(event.objects)}`)))
+                        : true)) {
+                                return (
+                                    <LogLineView
+                                        id={`L${event._key}`}
+                                        key={event._key}
+                                        className={classes.row}
+                                        event={event}
+                                        isSelected={selected.includes(event._key)}
+                                    />
+                                );
+                            }
+                            return null; // ignore this line
+                        }) }
+                    </div>
+                </div>
+            </Paper>
+        </div>
+    );
+};
+
+ThemedLogView.propTypes = {
+    classes: PropTypes.object.isRequired,
+    className: PropTypes.string,
+    log: PropTypes.array.isRequired,
+    selected: PropTypes.array,
+    isExpanded: PropTypes.bool,
+    expand: PropTypes.func.isRequired,
+    levelFilter: PropTypes.number.isRequired,
+    regexFilter: PropTypes.string.isRequired,
+    re: PropTypes.object,
+    handleChangeLevelFilter: PropTypes.func.isRequired,
+    handleChangeRegexFilter: PropTypes.func.isRequired,
+};
+
+ThemedLogView.defaultProps = {
+    className: '',
+    selected: [],
+    isExpanded: false,
+    re: null,
+};
 
 LogView.propTypes = {
     classes: PropTypes.object.isRequired,

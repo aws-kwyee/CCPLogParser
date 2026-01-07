@@ -22,6 +22,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import { useTheme } from './ThemeContext';
 
 const styles = (theme) => ({
     root: {
@@ -37,7 +38,6 @@ const styles = (theme) => ({
         flexShrink: 0,
         flexDirection: 'column',
         padding: theme.spacing(1, 2),
-        background: '#f7f7f7',
     },
     headerInside: {
         position: 'relative',
@@ -54,7 +54,6 @@ const styles = (theme) => ({
     list: {
         width: '100%',
         height: '100%',
-        backgroundColor: theme.palette.background.paper,
         position: 'relative',
         overflow: 'auto',
         padding: 0,
@@ -70,9 +69,6 @@ const styles = (theme) => ({
     item: {
         padding: theme.spacing(0.5, 2),
         display: 'block',
-    },
-    selected: {
-        background: 'rgba(255,255,0,0.3)',
     },
 });
 
@@ -141,41 +137,85 @@ class SnapshotListView extends React.PureComponent {
             }, {});
 
         return (
-            <div className={clsx(classes.root, classNameProp)}>
-                <Container
-                    title="Snapshots"
-                    gutters={false}
-                >
-                    <div className={classes.content}>
-                        <List className={classes.list} subheader={<li />}>
-                            {Object.keys(snapshotsByDate).map((date) => (
-                                <li key={`section-${date}`} className={classes.listSection}>
-                                    <ul className={classes.ul}>
-                                        <ListSubheader>{date}</ListSubheader>
-                                        {snapshotsByDate[date].map((snapshot) => (
-                                            <ListItem
-                                                button
-                                                key={`item-${snapshot._key}`}
-                                                className={clsx(classes.item, {
-                                                    // eslint-disable-next-line max-len
-                                                    [classes.selected]: selected.includes(snapshot._key),
-                                                })}
-                                                // eslint-disable-next-line max-len
-                                                onClick={(e) => this.handleClickSnapshot(e, snapshot)}
-                                            >
-                                                <ListItemText primary={`${snapshot._time}${snapshot._timezone} ${snapshot.state.name}`} />
-                                            </ListItem>
-                                        ))}
-                                    </ul>
-                                </li>
-                            ))}
-                        </List>
-                    </div>
-                </Container>
-            </div>
+            <ThemedSnapshotListView
+                classes={classes}
+                className={classNameProp}
+                snapshotsByDate={snapshotsByDate}
+                selected={selected}
+                handleClickSnapshot={this.handleClickSnapshot.bind(this)}
+            />
         );
     }
 }
+
+const ThemedSnapshotListView = ({
+    classes,
+    className: classNameProp,
+    snapshotsByDate,
+    selected,
+    handleClickSnapshot,
+}) => {
+    const { theme } = useTheme();
+
+    const themedStyles = {
+        list: {
+            backgroundColor: theme.colors.surface,
+            color: theme.colors.textPrimary,
+        },
+        subheader: {
+            backgroundColor: theme.colors.surface,
+            color: theme.colors.textPrimary,
+        },
+    };
+
+    return (
+        <div className={clsx(classes.root, classNameProp)}>
+            <Container
+                title="Snapshots"
+                gutters={false}
+            >
+                <div className={classes.content}>
+                    <List className={classes.list} style={themedStyles.list} subheader={<li />}>
+                        {Object.keys(snapshotsByDate).map((date) => (
+                            <li key={`section-${date}`} className={classes.listSection}>
+                                <ul className={classes.ul}>
+                                    <ListSubheader style={themedStyles.subheader}>{date}</ListSubheader>
+                                    {snapshotsByDate[date].map((snapshot) => (
+                                        <ListItem
+                                            button
+                                            key={`item-${snapshot._key}`}
+                                            className={clsx(classes.item)}
+                                            style={{
+                                                background: selected.includes(snapshot._key) ? theme.colors.selected : 'transparent',
+                                                color: theme.colors.textPrimary,
+                                            }}
+                                            // eslint-disable-next-line max-len
+                                            onClick={(e) => handleClickSnapshot(e, snapshot)}
+                                        >
+                                            <ListItemText primary={`${snapshot._time}${snapshot._timezone} ${snapshot.state.name}`} />
+                                        </ListItem>
+                                    ))}
+                                </ul>
+                            </li>
+                        ))}
+                    </List>
+                </div>
+            </Container>
+        </div>
+    );
+};
+
+ThemedSnapshotListView.propTypes = {
+    classes: PropTypes.object.isRequired,
+    className: PropTypes.string,
+    snapshotsByDate: PropTypes.object.isRequired,
+    selected: PropTypes.array.isRequired,
+    handleClickSnapshot: PropTypes.func.isRequired,
+};
+
+ThemedSnapshotListView.defaultProps = {
+    className: '',
+};
 
 SnapshotListView.propTypes = {
     classes: PropTypes.object.isRequired,
