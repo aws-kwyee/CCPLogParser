@@ -218,3 +218,4 @@ $ serve -s build
 
 You can also deploy this tool in your own environment if needed.  The easiest way to deploy the tool is to upload the artifact to an S3 bucket, and host it with CloudFront. You can find the guide on how to create a static website with S3 + CloudFront at https://aws.amazon.com/premiumsupport/knowledge-center/cloudfront-serve-static-website/
 
+# CCPLogParser
