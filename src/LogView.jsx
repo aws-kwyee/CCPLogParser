@@ -37,8 +37,6 @@ const styles = (theme) => ({
         alignItems: 'center',
     },
     header: {
-        position: 'sticky',
-        top: 0,
         width: '100%',
         display: 'flex',
         zIndex: 1100,
@@ -88,7 +86,7 @@ const styles = (theme) => ({
     },
     content: {
         width: 'auto',
-        overflowX: 'scroll',
+        overflow: 'auto',
         fontFamily: '"Monaco", monospace',
         fontSize: 12,
         padding: theme.spacing(2, 0),
@@ -205,7 +203,7 @@ const ThemedLogView = ({
     };
 
     return (
-        <div className={clsx(classes.root, classNameProp)}>
+        <div className={clsx(classes.root, classNameProp)} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Paper style={themedStyles.paper}>
                 <div className={classes.header} style={themedStyles.header}>
                     <div className={classes.headerInside}>
@@ -232,7 +230,7 @@ const ThemedLogView = ({
                             : <Button variant="link" className={classes.expand} onClick={() => expand()}><UnfoldLess style={{ transform: 'rotate(90deg)' }} /></Button> }
                     </div>
                 </div>
-                <div className={classes.content} style={themedStyles.content}>
+                <div className={classes.content} style={{ ...themedStyles.content, flex: 1, overflow: 'auto', height: 'calc(100vh - 200px)' }}>
                     <div className={classes.rows}>
                         { log.map((event) => {
                             if (LogLevel[event.level] >= levelFilter

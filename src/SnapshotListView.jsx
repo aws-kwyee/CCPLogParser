@@ -27,7 +27,7 @@ import { useTheme } from './ThemeContext';
 const styles = (theme) => ({
     root: {
         position: 'sticky',
-        top: theme.spacing(2),
+        top: 0,
     },
     header: {
         position: 'static',
@@ -57,7 +57,7 @@ const styles = (theme) => ({
         position: 'relative',
         overflow: 'auto',
         padding: 0,
-        maxHeight: `calc(100vh - ${theme.spacing(10)}px)`,
+        maxHeight: `calc(100vh - 200px)`,
     },
     listSection: {
         backgroundColor: 'inherit',
@@ -91,12 +91,20 @@ class SnapshotListView extends React.PureComponent {
         selectLog(snapshot._targetEventKeys);
         selectSnapshots([snapshot._key]);
 
-        const anchor = `L${snapshot._targetEventKeys[0]}`;
-        scroller.scrollTo(anchor, {
-            duration: 800,
-            delay: 0,
-            smooth: 'easeInOutQuart',
+        // Find the first visible log entry in the target range
+        const firstVisibleKey = snapshot._targetEventKeys.find(key => {
+            const element = document.getElementById(`L${key}`);
+            return element !== null;
         });
+
+        if (firstVisibleKey) {
+            const anchor = `L${firstVisibleKey}`;
+            scroller.scrollTo(anchor, {
+                duration: 800,
+                delay: 0,
+                smooth: 'easeInOutQuart',
+            });
+        }
     }
 
     render() {

@@ -87,6 +87,7 @@ function a11yProps(index) {
 const styles = (theme) => ({
     root: {
         flexGrow: 1,
+        paddingTop: theme.mixins.toolbar.minHeight + 48, // Account for AppBar + Tabs height
     },
     appbar: {},
     title: {
@@ -116,6 +117,10 @@ const styles = (theme) => ({
         zIndex: 2,
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2),
+    },
+    scrollableContainer: {
+        height: `calc(100vh - ${theme.mixins.toolbar.minHeight + 48 + theme.spacing(4)}px)`,
+        overflow: 'hidden', // Prevent content from showing through
     },
     leftIcon: {
         marginRight: theme.spacing(1),
@@ -361,7 +366,7 @@ const ThemedApp = ({
                     {({ getRootProps, isDragActive }) => (
                         // eslint-disable-next-line react/jsx-props-no-spreading
                         <div {...getRootProps()}>
-                            <AppBar position="static" className={classes.appbar} style={themedStyles.appbar}>
+                            <AppBar position="fixed" className={classes.appbar} style={themedStyles.appbar}>
                                 <Toolbar variant="dense">
                                     <Typography variant="h6" color="inherit" className={classes.title}>
                                         CCP Log Parser
@@ -434,7 +439,7 @@ const ThemedApp = ({
                                     <TabPanel value={tabIndex} index={0}>
                                         <Container maxWidth={false} className={classes.content}>
                                             <Grid container spacing={2}>
-                                                <Grid item xs={12} md={3} style={isExpanded ? { display: 'none' } : {}}>
+                                                <Grid item xs={12} md={3} style={isExpanded ? { display: 'none' } : {}} className={classes.scrollableContainer}>
                                                     <SnapshotListView
                                                         log={log}
                                                         selected={selectedSnapshots}
@@ -447,6 +452,7 @@ const ThemedApp = ({
                                                     xs={12}
                                                     md={9}
                                                     style={isExpanded ? { minWidth: '100%', maxWidth: '100%' } : {}}
+                                                    className={classes.scrollableContainer}
                                                 >
                                                     <LogView
                                                         log={log}
