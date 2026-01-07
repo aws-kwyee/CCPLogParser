@@ -61,7 +61,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Container>
+                <Container maxWidth={false}>
                     <Box>{children}</Box>
                 </Container>
             )}
@@ -432,7 +432,7 @@ const ThemedApp = ({
                             { (!isInitial && !isLoading) && (
                                 <>
                                     <TabPanel value={tabIndex} index={0}>
-                                        <Container className={classes.content}>
+                                        <Container maxWidth={false} className={classes.content}>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12} md={3} style={isExpanded ? { display: 'none' } : {}}>
                                                     <SnapshotListView
@@ -459,7 +459,7 @@ const ThemedApp = ({
                                         </Container>
                                     </TabPanel>
                                     <TabPanel value={tabIndex} index={1}>
-                                        <Container className={classes.content}>
+                                        <Container maxWidth={false} className={classes.content}>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12}>
                                                     <ThemedMetricsView
