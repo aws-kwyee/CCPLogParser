@@ -363,9 +363,9 @@ const ThemedApp = ({
                     noClick
                     onDrop={handleOnDrop}
                 >
-                    {({ getRootProps, isDragActive }) => (
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        <div {...getRootProps()}>
+                    {({ getRootProps, getInputProps, isDragActive, open }) => (
+                        <div {...getRootProps({ onClick: evt => evt.preventDefault() })} style={{ outline: 'none' }}>
+                            <input {...getInputProps()} />
                             <AppBar position="fixed" className={classes.appbar} style={themedStyles.appbar}>
                                 <Toolbar variant="dense">
                                     <Typography variant="h6" color="inherit" className={classes.title}>
@@ -432,7 +432,7 @@ const ThemedApp = ({
 
                             { isDragActive && <DraggingView /> }
 
-                            { (isInitial && !isLoading) && <EmptyView /> }
+                            { (isInitial && !isLoading) && <EmptyView onClick={open} /> }
                             { isLoading && <LoadingView /> }
                             { (!isInitial && !isLoading) && (
                                 <>

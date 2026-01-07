@@ -15,6 +15,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import { useTheme } from './ThemeContext';
 
@@ -44,14 +45,14 @@ const styles = (theme) => ({
 });
 
 const EmptyView = (props) => {
-    const { classes } = props;
+    const { classes, onClick } = props;
 
     return (
-        <ThemedEmptyView classes={classes} />
+        <ThemedEmptyView classes={classes} onClick={onClick} />
     );
 };
 
-const ThemedEmptyView = ({ classes }) => {
+const ThemedEmptyView = ({ classes, onClick }) => {
     const { theme } = useTheme();
 
     return (
@@ -61,6 +62,9 @@ const ThemedEmptyView = ({ classes }) => {
                 <Typography className={classes.text} variant="h5" component="h3" style={{ color: theme.colors.textMuted }}>
                     Drag &amp; Drop your CCP log file to load
                 </Typography>
+                <Button variant="contained" color="primary" onClick={onClick} style={{ marginTop: 16 }}>
+                    Select File
+                </Button>
             </div>
         </div>
     );
@@ -68,10 +72,12 @@ const ThemedEmptyView = ({ classes }) => {
 
 ThemedEmptyView.propTypes = {
     classes: PropTypes.object.isRequired,
+    onClick: PropTypes.func,
 };
 
 EmptyView.propTypes = {
     classes: PropTypes.object.isRequired,
+    onClick: PropTypes.func,
 };
 
 export default withStyles(styles)(EmptyView);
