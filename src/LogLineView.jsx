@@ -175,7 +175,7 @@ const ThemedLogLineView = ({
     return (
         // eslint-disable-next-line react/jsx-props-no-spreading
         <div className={clsx(classes.root, classNameProp)} {...props}>
-            <div 
+            <div
                 className={clsx(classes.line, {
                     [classes.error]: event.level === 'ERROR',
                     [classes.warn]: event.level === 'WARN',

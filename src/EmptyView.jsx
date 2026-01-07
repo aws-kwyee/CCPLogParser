@@ -72,12 +72,12 @@ const ThemedEmptyView = ({ classes, onClick }) => {
 
 ThemedEmptyView.propTypes = {
     classes: PropTypes.object.isRequired,
-    onClick: PropTypes.func,
+    onClick: PropTypes.func.isRequired,
 };
 
 EmptyView.propTypes = {
     classes: PropTypes.object.isRequired,
-    onClick: PropTypes.func,
+    onClick: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(EmptyView);

@@ -230,7 +230,12 @@ const ThemedLogView = ({
                             : <Button variant="link" className={classes.expand} onClick={() => expand()}><UnfoldLess style={{ transform: 'rotate(90deg)' }} /></Button> }
                     </div>
                 </div>
-                <div className={classes.content} style={{ ...themedStyles.content, flex: 1, overflow: 'auto', height: 'calc(100vh - 200px)' }}>
+                <div
+                    className={classes.content}
+                    style={{
+                        ...themedStyles.content, flex: 1, overflow: 'auto', height: 'calc(100vh - 200px)',
+                    }}
+                >
                     <div className={classes.rows}>
                         { log.map((event) => {
                             if (LogLevel[event.level] >= levelFilter

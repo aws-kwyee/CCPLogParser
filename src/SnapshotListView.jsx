@@ -57,7 +57,7 @@ const styles = (theme) => ({
         position: 'relative',
         overflow: 'auto',
         padding: 0,
-        maxHeight: `calc(100vh - 200px)`,
+        maxHeight: 'calc(100vh - 200px)',
     },
     listSection: {
         backgroundColor: 'inherit',
@@ -92,7 +92,7 @@ class SnapshotListView extends React.PureComponent {
         selectSnapshots([snapshot._key]);
 
         // Find the first visible log entry in the target range
-        const firstVisibleKey = snapshot._targetEventKeys.find(key => {
+        const firstVisibleKey = snapshot._targetEventKeys.find((key) => {
             const element = document.getElementById(`L${key}`);
             return element !== null;
         });
@@ -150,7 +150,7 @@ class SnapshotListView extends React.PureComponent {
                 className={classNameProp}
                 snapshotsByDate={snapshotsByDate}
                 selected={selected}
-                handleClickSnapshot={this.handleClickSnapshot.bind(this)}
+                handleClickSnapshot={(e, snapshot) => this.handleClickSnapshot(e, snapshot)}
             />
         );
     }

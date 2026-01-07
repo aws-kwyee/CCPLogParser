@@ -363,128 +363,135 @@ const ThemedApp = ({
                     noClick
                     onDrop={handleOnDrop}
                 >
-                    {({ getRootProps, getInputProps, isDragActive, open }) => (
-                        <div {...getRootProps({ onClick: evt => evt.preventDefault() })} style={{ outline: 'none' }}>
-                            <input {...getInputProps()} />
-                            <AppBar position="fixed" className={classes.appbar} style={themedStyles.appbar}>
-                                <Toolbar variant="dense">
-                                    <Typography variant="h6" color="inherit" className={classes.title}>
-                                        CCP Log Parser
-                                        { filename && (
-                                            <span>
-                                                &nbsp;:&nbsp;
-                                                {filename}
-                                            </span>
-                                        ) }
-                                    </Typography>
-                                    <Typography color="inherit" className={classes.feedbackLink}>
-                                        <Link
-                                            href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/CHANGELOG.md"
-                                            target="_blank"
-                                            rel="noopener"
-                                            onClick={(e) => e.preventDefault}
-                                        >
-                                            Version:
-                                            {' '}
-                                            {pkg.version}
-                                        </Link>
-                                    </Typography>
-                                    <Typography color="inherit" className={classes.feedbackLink}>
-                                        <Link
-                                            href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/README.md"
-                                            target="_blank"
-                                            rel="noopener"
-                                            onClick={(e) => e.preventDefault}
-                                        >
-                                            <DescriptionIcon className={classes.leftIcon} />
-                                            User Guide
-                                        </Link>
-                                    </Typography>
-                                    <Typography color="inherit" className={classes.feedbackLink}>
-                                        <Link
-                                            href="https://github.com/amazon-connect/amazon-connect-snippets/issues"
-                                            target="_blank"
-                                            rel="noopener"
-                                            onClick={(e) => e.preventDefault}
-                                        >
-                                            <FeedbackIcon className={classes.leftIcon} />
-                                            Send Feedback
-                                        </Link>
-                                    </Typography>
-                                    <ThemeToggle classes={classes} />
-                                </Toolbar>
-                                { (!isInitial && !isLoading) && (
-                                    <Tabs
-                                        className={classes.tab}
-                                        style={themedStyles.tab}
-                                        value={tabIndex}
-                                        onChange={handleChangeTab}
-                                        centered
-                                        aria-label="tabs"
-                                    >
-                                        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                                        <Tab label="Snapshots &amp; Logs" {...a11yProps(0)} />
-                                        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                                        <Tab label="Metrics" {...a11yProps(1)} />
-                                    </Tabs>
-                                ) }
-                            </AppBar>
+                    {
+                        (
+                            {
+                                getRootProps, getInputProps, isDragActive, open,
+                            },
+                        ) => (
+                            <div {...getRootProps({ onClick: (evt) => evt.preventDefault() })} style={{ outline: 'none' }}>
+                                <input {...getInputProps()} />
+                                <AppBar position="fixed" className={classes.appbar} style={themedStyles.appbar}>
+                                    <Toolbar variant="dense">
+                                        <Typography variant="h6" color="inherit" className={classes.title}>
+                                            CCP Log Parser
+                                            {filename && (
+                                                <span>
+                                                    &nbsp;:&nbsp;
+                                                    {filename}
+                                                </span>
+                                            )}
 
-                            { isDragActive && <DraggingView /> }
+                                        </Typography>
+                                        <Typography color="inherit" className={classes.feedbackLink}>
+                                            <Link
+                                                href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/CHANGELOG.md"
+                                                target="_blank"
+                                                rel="noopener"
+                                                onClick={(e) => e.preventDefault()}
+                                            >
+                                                Version:
+                                                {' '}
+                                                {pkg.version}
+                                            </Link>
+                                        </Typography>
+                                        <Typography color="inherit" className={classes.feedbackLink}>
+                                            <Link
+                                                href="https://github.com/amazon-connect/amazon-connect-snippets/blob/master/tools/CCPLogParser/README.md"
+                                                target="_blank"
+                                                rel="noopener"
+                                                onClick={(e) => e.preventDefault()}
+                                            >
+                                                <DescriptionIcon className={classes.leftIcon} />
+                                                User Guide
+                                            </Link>
+                                        </Typography>
+                                        <Typography color="inherit" className={classes.feedbackLink}>
+                                            <Link
+                                                href="https://github.com/amazon-connect/amazon-connect-snippets/issues"
+                                                target="_blank"
+                                                rel="noopener"
+                                                onClick={(e) => e.preventDefault()}
+                                            >
+                                                <FeedbackIcon className={classes.leftIcon} />
+                                                Send Feedback
+                                            </Link>
+                                        </Typography>
+                                        <ThemeToggle classes={classes} />
+                                    </Toolbar>
+                                    {(!isInitial && !isLoading) && (
+                                        <Tabs
+                                            className={classes.tab}
+                                            style={themedStyles.tab}
+                                            value={tabIndex}
+                                            onChange={handleChangeTab}
+                                            centered
+                                            aria-label="tabs"
+                                        >
+                                            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                                            <Tab label="Snapshots &amp; Logs" {...a11yProps(0)} />
+                                            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                                            <Tab label="Metrics" {...a11yProps(1)} />
+                                        </Tabs>
+                                    )}
+                                </AppBar>
 
-                            { (isInitial && !isLoading) && <EmptyView onClick={open} /> }
-                            { isLoading && <LoadingView /> }
-                            { (!isInitial && !isLoading) && (
-                                <>
-                                    <TabPanel value={tabIndex} index={0}>
-                                        <Container maxWidth={false} className={classes.content}>
-                                            <Grid container spacing={2}>
-                                                <Grid item xs={12} md={3} style={isExpanded ? { display: 'none' } : {}} className={classes.scrollableContainer}>
-                                                    <SnapshotListView
-                                                        log={log}
-                                                        selected={selectedSnapshots}
-                                                        selectLog={selectLog}
-                                                        selectSnapshots={selectSnapshots}
-                                                    />
-                                                </Grid>
-                                                <Grid
-                                                    item
-                                                    xs={12}
-                                                    md={9}
-                                                    style={isExpanded ? { minWidth: '100%', maxWidth: '100%' } : {}}
-                                                    className={classes.scrollableContainer}
-                                                >
-                                                    <LogView
-                                                        log={log}
-                                                        selected={selectedLog}
-                                                        isExpanded={isExpanded}
-                                                        expand={handleExpandLogView}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </Container>
-                                    </TabPanel>
-                                    <TabPanel value={tabIndex} index={1}>
-                                        <Container maxWidth={false} className={classes.content}>
-                                            <Grid container spacing={2}>
-                                                <Grid item xs={12}>
-                                                    <ThemedMetricsView
-                                                        log={log}
-                                                        indexedLogs={indexedLogs}
-                                                    />
-                                                    { hasRtcMetrics && (
-                                                        <RtcMetricsViewGroup
-                                                            timeRange={timeRange}
+                                {isDragActive && <DraggingView />}
+
+                                {(isInitial && !isLoading) && <EmptyView onClick={open} />}
+                                {isLoading && <LoadingView />}
+                                {(!isInitial && !isLoading) && (
+                                    <>
+                                        <TabPanel value={tabIndex} index={0}>
+                                            <Container maxWidth={false} className={classes.content}>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12} md={3} style={isExpanded ? { display: 'none' } : {}} className={classes.scrollableContainer}>
+                                                        <SnapshotListView
+                                                            log={log}
+                                                            selected={selectedSnapshots}
+                                                            selectLog={selectLog}
+                                                            selectSnapshots={selectSnapshots}
                                                         />
-                                                    )}
+                                                    </Grid>
+                                                    <Grid
+                                                        item
+                                                        xs={12}
+                                                        md={9}
+                                                        style={isExpanded ? { minWidth: '100%', maxWidth: '100%' } : {}}
+                                                        className={classes.scrollableContainer}
+                                                    >
+                                                        <LogView
+                                                            log={log}
+                                                            selected={selectedLog}
+                                                            isExpanded={isExpanded}
+                                                            expand={handleExpandLogView}
+                                                        />
+                                                    </Grid>
                                                 </Grid>
-                                            </Grid>
-                                        </Container>
-                                    </TabPanel>
-                                </>
-                            ) }
-                        </div>
-                    )}
+                                            </Container>
+                                        </TabPanel>
+                                        <TabPanel value={tabIndex} index={1}>
+                                            <Container maxWidth={false} className={classes.content}>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12}>
+                                                        <ThemedMetricsView
+                                                            log={log}
+                                                            indexedLogs={indexedLogs}
+                                                        />
+                                                        {hasRtcMetrics && (
+                                                            <RtcMetricsViewGroup
+                                                                timeRange={timeRange}
+                                                            />
+                                                        )}
+                                                    </Grid>
+                                                </Grid>
+                                            </Container>
+                                        </TabPanel>
+                                    </>
+                                )}
+                            </div>
+                        )
+                    }
                 </Dropzone>
             </div>
         </NorthStarThemeProvider>
