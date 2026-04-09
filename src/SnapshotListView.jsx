@@ -15,7 +15,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { scroller } from 'react-scroll';
 import { withStyles } from '@material-ui/core/styles';
 import Container from 'aws-northstar/layouts/Container';
 import List from '@material-ui/core/List';
@@ -98,12 +97,10 @@ class SnapshotListView extends React.PureComponent {
         });
 
         if (firstVisibleKey) {
-            const anchor = `L${firstVisibleKey}`;
-            scroller.scrollTo(anchor, {
-                duration: 800,
-                delay: 0,
-                smooth: 'easeInOutQuart',
-            });
+            const element = document.getElementById(`L${firstVisibleKey}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'auto', block: 'start' });
+            }
         }
     }
 
