@@ -317,6 +317,10 @@ class App extends React.Component {
         if (snapshot) {
             this.selectLog(snapshot._targetEventKeys);
             this.selectSnapshots([snapshot._key]);
+            const el = document.getElementById(`snapshot-${snapshot._key}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+            }
         }
     }
 
