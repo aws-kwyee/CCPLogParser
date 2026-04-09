@@ -168,6 +168,7 @@ const ThemedSnapshotListView = ({
                                         <ListItem
                                             button
                                             key={`item-${snapshot._key}`}
+                                            id={`snapshot-${snapshot._key}`}
                                             className={clsx(classes.item)}
                                             style={{
                                                 background: selected.includes(snapshot._key) ? theme.colors.selected : 'transparent',
