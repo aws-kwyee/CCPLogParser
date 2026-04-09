@@ -106,29 +106,8 @@ class SnapshotListView extends React.PureComponent {
 
     render() {
         const {
-            classes, className: classNameProp, log, selected = [],
+            classes, className: classNameProp, snapshots = [], selected = [],
         } = this.props;
-
-        const snapshots = log
-            .filter((event) => (event.text === 'GET_AGENT_SNAPSHOT succeeded.'))
-            .flatMap((event) => event.objects.map((object, idx) => ({
-                ...object.snapshot,
-                _event: event,
-                _key: `${event._key}-${idx}`,
-                _date: object.snapshot.snapshotTimestamp.substring(0, 10),
-                _time: object.snapshot.snapshotTimestamp.substring(11, 23),
-                _timezone: object.snapshot.snapshotTimestamp.substring(23),
-            })))
-            .map((snapshot, idx, arr) => {
-                const eventKeyFrom = snapshot._event._key;
-                // eslint-disable-next-line max-len
-                const eventKeyTo = (idx !== arr.length - 1) ? arr[idx + 1]._event._key : log[log.length - 1]._key;
-                return {
-                    ...snapshot,
-                    // eslint-disable-next-line max-len
-                    _targetEventKeys: Array.from(Array(eventKeyTo - eventKeyFrom), (v, k) => (k + eventKeyFrom)),
-                };
-            });
 
         const snapshotsByDate = snapshots
             .reduce((acc, snapshot) => {
@@ -226,12 +205,14 @@ SnapshotListView.propTypes = {
     classes: PropTypes.object.isRequired,
     className: PropTypes.string,
     log: PropTypes.array.isRequired,
+    snapshots: PropTypes.array,
     selected: PropTypes.array,
     selectLog: PropTypes.func.isRequired,
     selectSnapshots: PropTypes.func.isRequired,
 };
 SnapshotListView.defaultProps = {
     className: '',
+    snapshots: [],
     selected: [],
 };
 
